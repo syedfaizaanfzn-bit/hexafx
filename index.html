@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hexa FX - Gold trading bot for MetaTrader 5</title>
+<meta name="description" content="Hexa FX is an automatic trading bot (Expert Advisor) for gold (XAUUSD) on MetaTrader 5.">
+<style>
+:root{
+  --ink:#0d1b27;
+  --ink-2:#142a3a;
+  --paper:#f4f1e9;
+  --gold:#d9ab3e;
+  --gold-2:#f0c75e;
+  --muted:#a7b5bf;
+  --line:#26435a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:18px;
+  line-height:1.65;
+}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+
+/* Header */
+header{
+  position:sticky;top:0;z-index:10;
+  background:rgba(13,27,39,.92);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+}
+header .wrap{display:flex;justify-content:space-between;align-items:center;height:68px}
+.logo{font-weight:bold;font-size:23px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo svg{width:28px;height:28px}
+.logo svg polygon{fill:none;stroke:var(--gold);stroke-width:8}
+.logo span{color:var(--gold)}
+nav a{font-family:Arial,Helvetica,sans-serif;font-size:15px;margin-left:22px;text-decoration:none;color:var(--muted)}
+nav a:hover{color:var(--paper)}
+nav a.cta{color:var(--ink);background:var(--gold);padding:8px 16px;border-radius:4px;font-weight:bold}
+nav a.cta:hover{background:var(--gold-2)}
+
+/* Hero */
+.hero{
+  padding:80px 0 96px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='84' height='146' viewBox='0 0 84 146'><g fill='none' stroke='%231d3a4f' stroke-width='1.5'><polygon points='42,2 82,25 82,71 42,94 2,71 2,25'/><polygon points='0,75 0,121 40,144 80,121 80,75'/><polygon points='84,75 84,121 124,144 164,121 164,75'/></g></svg>");
+}
+.hero .wrap{display:grid;grid-template-columns:1.25fr .75fr;gap:48px;align-items:center}
+.tag{
+  display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:14px;
+  color:var(--gold);border:1px solid var(--gold);padding:5px 14px;border-radius:30px;margin-bottom:22px;
+}
+h1{font-size:clamp(40px,7vw,70px);line-height:1.05;font-weight:normal}
+h1 em{font-style:normal;color:var(--gold)}
+.hero p.lead{margin:24px 0 34px;color:var(--muted);max-width:30em;font-size:20px}
+.btn{
+  display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:16px;
+  background:var(--gold);color:var(--ink);padding:15px 28px;text-decoration:none;border-radius:4px;
+}
+.btn:hover{background:var(--gold-2)}
+.btn.ghost{background:transparent;color:var(--paper);border:1px solid var(--line);margin-left:10px}
+.btn.ghost:hover{border-color:var(--gold)}
+
+.hex{width:100%;max-width:340px;justify-self:center}
+.hex .outer{fill:var(--ink-2);stroke:var(--gold);stroke-width:3}
+.hex .inner{fill:none;stroke:var(--line);stroke-width:2}
+.hex text{fill:var(--paper);font-family:Georgia,serif;font-size:40px;text-anchor:middle}
+.hex .sub{fill:var(--gold);font-family:Arial,sans-serif;font-size:15px;letter-spacing:3px}
+
+/* Strip */
+.strip{background:var(--ink-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.strip .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding-top:26px;padding-bottom:26px}
+.strip div{font-family:Arial,Helvetica,sans-serif;font-size:15px;color:var(--muted);text-align:center}
+.strip b{display:block;color:var(--paper);font-size:17px;margin-bottom:2px}
+
+/* Sections */
+section{padding:72px 0}
+h2{font-size:34px;font-weight:normal;margin-bottom:12px}
+.intro{color:var(--muted);margin-bottom:40px;max-width:34em}
+
+.steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:32px;counter-reset:s}
+.steps li{counter-increment:s;padding-top:18px;border-top:3px solid var(--gold)}
+.steps li::before{content:"Step " counter(s);display:block;font-family:Arial,sans-serif;font-size:14px;color:var(--gold);margin-bottom:6px}
+.steps h3{font-size:22px;font-weight:normal;margin-bottom:8px}
+.steps p{color:var(--muted);font-size:16px}
+
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.fact{background:var(--ink-2);border:1px solid var(--line);border-left:4px solid var(--gold);padding:22px 24px;border-radius:4px}
+.fact h3{font-size:20px;font-weight:normal;margin-bottom:4px}
+.fact p{color:var(--muted);font-size:16px}
+
+/* Price */
+.price{background:var(--ink-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.price .box{
+  max-width:520px;border:2px solid var(--gold);border-radius:6px;padding:34px;background:var(--ink);
+}
+.price .big{font-size:44px;color:var(--gold);margin:8px 0}
+.price ul{list-style:none;margin:18px 0 26px;font-size:16px;color:var(--muted)}
+.price li{padding:6px 0 6px 26px;position:relative}
+.price li::before{content:"";position:absolute;left:0;top:14px;width:12px;height:12px;background:var(--gold);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+
+/* FAQ */
+details{border-bottom:1px solid var(--line);padding:18px 0}
+summary{cursor:pointer;font-size:20px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--gold);font-size:26px;line-height:1}
+details[open] summary::after{content:"\2212"}
+details p{color:var(--muted);margin-top:10px;font-size:16px;max-width:40em}
+
+/* Contact */
+.contact{background:var(--ink-2);border-top:1px solid var(--line);text-align:center}
+.contact p{color:var(--muted);margin:0 auto 30px;max-width:30em}
+
+.risk{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:var(--muted);padding:40px 0 20px}
+.risk p{max-width:62em}
+footer{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:var(--muted);padding:0 0 40px}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media(max-width:780px){
+  .hero{padding:48px 0 64px}
+  .hero .wrap{grid-template-columns:1fr}
+  .hex{max-width:200px;order:-1;justify-self:start}
+  .steps,.facts{grid-template-columns:1fr}
+  .strip .wrap{grid-template-columns:repeat(2,1fr)}
+  .btn.ghost{margin:12px 0 0}
+  nav a:not(.cta){display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,5 92,28 92,72 50,95 8,72 8,28"/></svg>
+      <div>Hexa <span>FX</span></div>
+    </a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#why">Details</a>
+      <a href="#price">Price</a>
+      <a href="#faq">FAQ</a>
+      <a class="cta" href="#contact">Get Hexa FX</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <span class="tag">For MetaTrader 5</span>
+        <h1>The gold trading bot that <em>never sleeps.</em></h1>
+        <p class="lead">Hexa FX is an Expert Advisor that trades XAUUSD on its own. Set it up once, and let it work while you do other things.</p>
+        <a class="btn" href="#contact">Get Hexa FX</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+      <svg class="hex" viewBox="0 0 300 300" role="img" aria-label="Hexa FX hexagon logo">
+        <polygon class="outer" points="150,10 271,80 271,220 150,290 29,220 29,80"/>
+        <polygon class="inner" points="150,45 241,97 241,203 150,255 59,203 59,97"/>
+        <text x="150" y="152">Hexa FX</text>
+        <text class="sub" x="150" y="184">XAUUSD</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="wrap">
+      <div><b>MetaTrader 5</b>Platform</div>
+      <div><b>XAUUSD</b>Gold</div>
+      <div><b>Automatic</b>24/5 trading</div>
+      <div><b>Support</b>On WhatsApp and Telegram</div>
+    </div>
+  </div>
+
+  <section id="how">
+    <div class="wrap">
+      <h2>Start in three steps</h2>
+      <p class="intro">No hard setup. We help you from the first message.</p>
+      <ol class="steps">
+        <li>
+          <h3>Contact us</h3>
+          <p>Send a message on WhatsApp or Telegram. We tell you the price and how to get the bot.</p>
+        </li>
+        <li>
+          <h3>Install on MT5</h3>
+          <p>Add Hexa FX to your MetaTrader 5 and open a XAUUSD chart. We guide you step by step.</p>
+        </li>
+        <li>
+          <h3>Let it run</h3>
+          <p>Turn on auto trading. The bot follows its rules and manages the trades for you.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="why" style="padding-top:0">
+    <div class="wrap">
+      <h2>What you should know</h2>
+      <p class="intro">Simple facts, no hype.</p>
+      <div class="facts">
+        <div class="fact">
+          <h3>Made for gold</h3>
+          <p>Hexa FX is built for XAUUSD on MetaTrader 5.</p>
+        </div>
+        <div class="fact">
+          <h3>Runs by fixed rules</h3>
+          <p>No fear, no greed, no missed entries. The bot follows its plan every time.</p>
+        </div>
+        <div class="fact">
+          <h3>Licensed to your account</h3>
+          <p>Each copy works only on your approved account.</p>
+        </div>
+        <div class="fact">
+          <h3>Help when you need it</h3>
+          <p>Message us if you have any problem with setup.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="price" class="price">
+    <div class="wrap">
+      <h2>Price</h2>
+      <p class="intro">One clear plan. Message us to confirm the latest price.</p>
+      <div class="box">
+        <p style="font-family:Arial,sans-serif;font-size:15px;color:var(--gold)">Hexa FX license</p>
+        <div class="big">Message us</div>
+        <ul>
+          <li>Hexa FX for MetaTrader 5</li>
+          <li>Setup help</li>
+          <li>Support on WhatsApp and Telegram</li>
+        </ul>
+        <a class="btn" href="#contact">Ask for price</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>Questions</h2>
+      <p class="intro">Short answers to common questions.</p>
+      <details>
+        <summary>Which platform does it work on?</summary>
+        <p>Hexa FX works on MetaTrader 5.</p>
+      </details>
+      <details>
+        <summary>Which market does it trade?</summary>
+        <p>It is made for gold (XAUUSD).</p>
+      </details>
+      <details>
+        <summary>Do I need to watch it all day?</summary>
+        <p>No. Once it is set up and auto trading is on, it runs by itself. It is still good to check your account now and then.</p>
+      </details>
+      <details>
+        <summary>Can I lose money?</summary>
+        <p>Yes. All trading has risk. Never trade with money you cannot afford to lose.</p>
+      </details>
+      <details>
+        <summary>How do I get help with setup?</summary>
+        <p>Message us on WhatsApp or Telegram. We will help you.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <h2>Ready to try Hexa FX?</h2>
+      <p>Message us now. We reply with the price and setup details.</p>
+      <a class="btn" href="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener">Chat on WhatsApp</a>
+      <a class="btn ghost" href="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener">Chat on Telegram</a>
+    </div>
+  </section>
+
+  <div class="risk">
+    <div class="wrap">
+      <p><strong>Risk warning:</strong> Trading gold and forex is risky. You can lose some or all of your money. Past results do not promise future results. Only trade with money you can afford to lose. Hexa FX is a software tool, not financial advice.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">&copy; 2026 Hexa FX. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
